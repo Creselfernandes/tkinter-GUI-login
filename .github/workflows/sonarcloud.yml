@@ -1,0 +1,36 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonarcloud:
+    name: SonarCloud Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 11  # Adjust this based on your project language
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+
+      - name: Build the project  # Change the build command based on your project setup
+        run: ./gradlew build
+
+      - name: Run SonarCloud Scan
+        run: ./gradlew sonarqube  # This depends on your build tool (Maven, Gradle, etc.)
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
